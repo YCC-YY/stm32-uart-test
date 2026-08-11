@@ -1,0 +1,15 @@
+# CLion IDE缓存
+.idea/
+build/
+cmake-build-*/
+
+# Python编译缓存
+__pycache__/
+*.pyc
+*.pyo
+
+# STM32编译产物
+*.elf
+*.hex
+*.bin
+*.ioc.backup
