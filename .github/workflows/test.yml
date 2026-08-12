@@ -20,7 +20,7 @@ jobs:
         run: pip install pytest pytest-html pyserial
 
       - name: 运行测试
-        run: pytest test_script/ -v --html=report.html --self-contained-html
+        run: python stm32_test/test_serial.py
 
       - name: 上传测试报告
         if: always()
