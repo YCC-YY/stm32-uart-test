@@ -21,10 +21,3 @@ jobs:
 
       - name: 运行测试
         run: python stm32_test/test_serial.py
-
-      - name: 上传测试报告
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-report
-          path: report.html
