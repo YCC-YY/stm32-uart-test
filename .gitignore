@@ -13,3 +13,10 @@ __pycache__/
 *.hex
 *.bin
 *.ioc.backup
+.idea/
+*.iml
+
+# Python虚拟环境与测试产物
+.venv/
+.pytest_cache/
+report.json

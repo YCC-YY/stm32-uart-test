@@ -26,6 +26,7 @@
 #include "usart.h"
 #include <string.h>
 #include <stdio.h>
+#include "uart_cmd.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -115,34 +116,8 @@ int main(void) {
       // 必须加上这一句，把接收到的字节变成C字符串
       rx_buf[rx_idx] = '\0';
 
-      // 回显收到的原始数据（可选）
-      HAL_UART_Transmit(&huart1, rx_buf, rx_idx, 100);
-      uint8_t enter[] = "\r\n";
-      HAL_UART_Transmit(&huart1, enter, sizeof(enter)-1, 100);
-
-
-      if(strcmp((char*)rx_buf,"led_on") == 0)
-      {
-        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_RESET);
-        uint8_t resp[] = "-->LED 打开\r\n";
-        HAL_UART_Transmit(&huart1, resp, sizeof(resp)-1,100);
-      }
-      else if(strcmp((char*)rx_buf,"led_off") == 0)
-      {
-        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_SET);
-        uint8_t resp[] = "-->LED 关闭\r\n";
-        HAL_UART_Transmit(&huart1, resp, sizeof(resp)-1,100);
-      }
-      else if(strcmp((char*)rx_buf,"hello") ==0)
-      {
-        uint8_t resp[] = "-->Hello from STM32!\r\n";
-        HAL_UART_Transmit(&huart1, resp, sizeof(resp)-1,100);
-      }
-      else
-      {
-        uint8_t resp[] = "-->未知命令\r\n";
-        HAL_UART_Transmit(&huart1, resp, sizeof(resp)-1,100);
-      }
+      // 命令解析统一交给 uart_cmd.c 模块处理
+      UART_Cmd_Process((char*)rx_buf);
       rx_idx = 0;
     }
   }
@@ -195,6 +170,14 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+// printf 重定向到串口：syscalls.c 的 weak _write 最终调用 __io_putchar
+int __io_putchar(int ch)
+{
+    uint8_t c = (uint8_t)ch;
+    HAL_UART_Transmit(&huart1, &c, 1, HAL_MAX_DELAY);
+    return ch;
+}
+
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
   if(huart->Instance == USART1)
